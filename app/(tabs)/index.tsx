@@ -1,3 +1,4 @@
+// HomeScreen.tsx
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -6,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   Modal,
+  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Zap, Activity, MapPin, Calendar, X } from 'lucide-react-native';
@@ -56,6 +58,37 @@ const mockDoctors: Doctor[] = [
   },
 ];
 
+// Basic FAQ answers you'd like the chatbot to be able to handle.
+// If your Chatbot component supports a `faqs` prop, it can use these responses.
+// If your Chatbot is implemented differently, copy these Q/A pairs into its knowledge base.
+const faqAnswers = [
+  {
+    q: 'what do i do if i have dementia',
+    a:
+      "If you suspect dementia, the first step is to see a healthcare professional (GP, neurologist or memory clinic) for an evaluation. They can assess symptoms, run tests, and recommend care, medication, therapies, and support services. Also: simplify daily routines, maintain structure, get social support, and keep active mentally and physically.",
+  },
+  {
+    q: 'how will i know if i have dementia or not',
+    a:
+      "Dementia is diagnosed by doctors using medical history, cognitive tests, physical exams, and sometimes brain scans or blood tests. Signs include persistent memory loss that affects daily life, trouble with language or problem solving, and changes in behaviour. A clinical assessment is needed — one-off forgetfulness alone doesn't mean dementia.",
+  },
+  {
+    q: 'i forgot to bath yesterday does that mean i have dementia',
+    a:
+      "Missing one bath is not a sign of dementia by itself — people forget things for many reasons (busy day, tiredness, mood). Dementia is about repeated, progressive changes that affect daily independence. If this happens often or other everyday skills are affected, discuss it with a clinician.",
+  },
+  {
+    q: 'i forgot what i ate in lunch today does that mean i have dementia',
+    a:
+      "Forgetting small recent details (like what you ate) occasionally is normal, especially when distracted. Dementia-related memory problems are more consistent and impact day-to-day functioning (e.g., repeating questions, getting lost, forgetting important events). If you're worried, monitor patterns and consult a doctor.",
+  },
+  {
+    q: 'i forgot my friends birthday does that mean i have dementia',
+    a:
+      "Forgetting a friend's birthday occasionally doesn't mean dementia. People forget dates for many reasons. Dementia typically causes more persistent memory loss and decline in other mental abilities. If memory lapses become frequent or cause functional problems, see a healthcare professional.",
+  },
+];
+
 export default function HomeScreen() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
@@ -95,16 +128,18 @@ export default function HomeScreen() {
             <Text style={styles.greeting}>{getGreeting()}</Text>
             <Text style={styles.userName}>{profile?.username || 'User'}</Text>
           </View>
-          <View
+          <TouchableOpacity
             style={[
               styles.avatar,
               { backgroundColor: profile?.avatarColor || '#4A90E2' },
             ]}
+            onPress={() => router.push('/(tabs)/profile' as any)}
+            activeOpacity={0.7}
           >
             <Text style={styles.avatarText}>
               {profile?.username ? getInitials(profile.username) : 'U'}
             </Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* Scan Options */}
@@ -142,11 +177,13 @@ export default function HomeScreen() {
         <View style={styles.mapSection}>
           <Text style={styles.sectionTitle}>Find Specialists Near You</Text>
           <View style={styles.mapContainer}>
-            <View style={styles.mapPlaceholder}>
-              <MapPin color="#4A90E2" size={40} />
-              <Text style={styles.mapText}>Interactive Map</Text>
-            </View>
-            
+            {/* Use the Google maps placeholder image for an 'interactive map' look */}
+            <Image
+              source={{ uri: 'https://staticmapmaker.com/img/google-placeholder.png' }}
+              style={styles.mapImage}
+              resizeMode="cover"
+            />
+
             {/* Doctor Pins */}
             <View style={styles.doctorPinsContainer}>
               {mockDoctors.map((doctor, index) => (
@@ -154,10 +191,10 @@ export default function HomeScreen() {
                   key={doctor.id}
                   style={[
                     styles.doctorPin,
-                    { 
-                      left: `${20 + index * 25}%`, 
-                      top: `${30 + index * 15}%` 
-                    }
+                    {
+                      left: `${20 + index * 25}%`,
+                      top: `${30 + index * 15}%`,
+                    },
                   ]}
                   onPress={() => setSelectedDoctor(doctor)}
                   activeOpacity={0.7}
@@ -177,7 +214,7 @@ export default function HomeScreen() {
               <Text style={styles.improvementTitle}>Cognitive Enhancement</Text>
               <Text style={styles.improvementWeek}>Week 3 of 12</Text>
             </View>
-            
+
             <View style={styles.progressBarContainer}>
               <View style={styles.progressBar}>
                 <View style={[styles.progressFill, { width: '25%' }]} />
@@ -258,9 +295,17 @@ export default function HomeScreen() {
                   </View>
                 </View>
 
-                <TouchableOpacity style={styles.bookButton} activeOpacity={0.8}>
-                  <Calendar color="#fff" size={20} />
-                  <Text style={styles.bookButtonText}>Book Appointment</Text>
+                {/* replaced Book Appointment with See All -> opens specialist screen */}
+                <TouchableOpacity
+                  style={styles.bookButton}
+                  activeOpacity={0.8}
+                  onPress={() => {
+                    setSelectedDoctor(null);
+                    // navigate to specialist screen — ensure this route exists in your app
+                    router.push('/(tabs)/specialists' as any);
+                  }}
+                >
+                  <Text style={styles.bookButtonText}>See All</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -268,7 +313,8 @@ export default function HomeScreen() {
         </View>
       </Modal>
 
-      <Chatbot />
+      {/* Pass the FAQ answers to Chatbot so the bot can respond to the dementia Q/A */}
+      <Chatbot faqs={faqAnswers} />
     </View>
   );
 }
@@ -379,6 +425,15 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
     position: 'relative',
+  },
+  mapImage: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
   },
   mapPlaceholder: {
     flex: 1,

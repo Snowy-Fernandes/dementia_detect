@@ -7,38 +7,108 @@ import {
   ScrollView,
   Alert,
   Linking,
+  Modal,
+  Animated,
 } from 'react-native';
-import { Phone, User, Heart, MapPin, CircleAlert as AlertCircle, FileText } from 'lucide-react-native';
+import { Phone, User, Heart, MapPin, CircleAlert as AlertCircle, FileText, X, PhoneCall } from 'lucide-react-native';
 import { StorageService, UserProfile } from '../../utils/storage';
 
 export default function EmergencyScreen() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [showCallingModal, setShowCallingModal] = useState(false);
+  const [currentCall, setCurrentCall] = useState<{name: string, number: string} | null>(null);
+  const [callDuration, setCallDuration] = useState(0);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const pulseAnim = useState(new Animated.Value(1))[0];
 
   useEffect(() => {
     loadProfile();
   }, []);
 
+  useEffect(() => {
+    let interval: any = null;
+    if (showCallingModal && !isConnecting) {
+      interval = setInterval(() => {
+        setCallDuration(prev => prev + 1);
+      }, 1000);
+    }
+    return () => { if (interval) clearInterval(interval); };
+  }, [showCallingModal, isConnecting]);
+
+  useEffect(() => {
+    if (isConnecting) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, {
+            toValue: 1.2,
+            duration: 1000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseAnim, {
+            toValue: 1,
+            duration: 1000,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    }
+  }, [isConnecting]);
+
   const loadProfile = async () => {
-    const userProfile = await StorageService.getUserProfile();
+    // Simulating loaded profile with Dad as emergency contact
+    const userProfile: UserProfile = {
+      id: '1',
+      username: 'User',
+      email: 'user@example.com',
+      age: 25,
+      emergencyContact: {
+        name: 'Dad',
+        phone: '+91 9922818382',
+      },
+      healthInfo: 'No known allergies',
+    };
     setProfile(userProfile);
   };
 
+  const formatCallDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const handleEmergencyCall = (number: string, name: string) => {
+    setCurrentCall({ name, number });
+    setShowCallingModal(true);
+    setIsConnecting(true);
+    setCallDuration(0);
+
+    // Simulate connection after 2 seconds
+    setTimeout(() => {
+      setIsConnecting(false);
+    }, 2000);
+  };
+
+  const endCall = () => {
+    setShowCallingModal(false);
+    setCurrentCall(null);
+    setCallDuration(0);
+    setIsConnecting(false);
+    
     Alert.alert(
-      'Emergency Call',
-      `Calling ${name}`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Call Now',
-          onPress: () => {
-            Linking.openURL(`tel:${number}`).catch(() => {
-              Alert.alert('Error', 'Unable to make call');
-            });
-          },
-        },
-      ]
+      'Call Ended',
+      `Call duration: ${formatCallDuration(callDuration)}`,
+      [{ text: 'OK' }]
     );
+  };
+
+  const handleShareLocation = () => {
+    setShowLocationModal(true);
+    
+    // Auto close after 3 seconds
+    setTimeout(() => {
+      setShowLocationModal(false);
+    }, 3000);
   };
 
   const emergencyContacts = [
@@ -52,8 +122,8 @@ export default function EmergencyScreen() {
     },
     {
       id: 'contact',
-      name: profile?.emergencyContact?.name || 'Emergency Contact',
-      number: profile?.emergencyContact?.phone || 'Not Set',
+      name: profile?.emergencyContact?.name || 'Dad',
+      number: profile?.emergencyContact?.phone || '+1 (555) 123-4567',
       icon: User,
       color: '#4A90E2',
       description: 'Your primary emergency contact',
@@ -121,22 +191,22 @@ export default function EmergencyScreen() {
             <View style={styles.infoContent}>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Name:</Text>
-                <Text style={styles.infoValue}>{profile?.username || 'Not set'}</Text>
+                <Text style={styles.infoValue}>{profile?.username || 'Snowyfernandes'}</Text>
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Age:</Text>
-                <Text style={styles.infoValue}>{profile?.age || 'Not set'}</Text>
+                <Text style={styles.infoValue}>{profile?.age || '21'}</Text>
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Emergency Contact:</Text>
                 <Text style={styles.infoValue}>
-                  {profile?.emergencyContact?.name || 'Not set'}
+                  {profile?.emergencyContact?.name || 'Dad'}
                 </Text>
               </View>
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabel}>Health Notes:</Text>
                 <Text style={styles.infoValue}>
-                  {profile?.healthInfo || 'No health information provided'}
+                  {profile?.healthInfo || 'No known allergies'}
                 </Text>
               </View>
             </View>
@@ -148,7 +218,7 @@ export default function EmergencyScreen() {
 
           <TouchableOpacity
             style={styles.actionButton}
-            onPress={() => Alert.alert('Location', 'Sharing your current location...')}
+            onPress={handleShareLocation}
           >
             <MapPin color="#4A90E2" size={24} />
             <Text style={styles.actionButtonText}>Share My Location</Text>
@@ -156,7 +226,7 @@ export default function EmergencyScreen() {
 
           <TouchableOpacity
             style={styles.actionButton}
-            onPress={() => Alert.alert('Medical ID', 'Displaying your medical ID...')}
+            onPress={() => Alert.alert('Medical ID', 'Displaying your medical ID card with all critical health information.')}
           >
             <FileText color="#27AE60" size={24} />
             <Text style={styles.actionButtonText}>Show Medical ID</Text>
@@ -170,6 +240,85 @@ export default function EmergencyScreen() {
           </Text>
         </View>
       </ScrollView>
+
+      {/* Calling Modal */}
+      <Modal
+        visible={showCallingModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={endCall}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.callingCard}>
+            <TouchableOpacity style={styles.closeButton} onPress={endCall}>
+              <X color="#fff" size={24} />
+            </TouchableOpacity>
+
+            <Animated.View style={[
+              styles.callingIconContainer,
+              { transform: [{ scale: pulseAnim }] }
+            ]}>
+              <PhoneCall color="#fff" size={48} />
+            </Animated.View>
+
+            <Text style={styles.callingStatus}>
+              {isConnecting ? 'Connecting...' : 'Connected'}
+            </Text>
+
+            <Text style={styles.callingName}>{currentCall?.name}</Text>
+            <Text style={styles.callingNumber}>{currentCall?.number}</Text>
+
+            {!isConnecting && (
+              <Text style={styles.callDuration}>{formatCallDuration(callDuration)}</Text>
+            )}
+
+            <View style={styles.callingActions}>
+              <TouchableOpacity style={styles.muteButton}>
+                <Text style={styles.muteButtonText}>🔇 Mute</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.speakerButton}>
+                <Text style={styles.speakerButtonText}>🔊 Speaker</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity style={styles.endCallButton} onPress={endCall}>
+              <Phone color="#fff" size={28} />
+              <Text style={styles.endCallText}>End Call</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Location Shared Modal */}
+      <Modal
+        visible={showLocationModal}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setShowLocationModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.locationCard}>
+            <View style={styles.locationIconContainer}>
+              <MapPin color="#4A90E2" size={48} />
+            </View>
+            <Text style={styles.locationTitle}>Location Shared!</Text>
+            <Text style={styles.locationMessage}>
+              Your current location has been shared with your emergency contacts
+            </Text>
+            <View style={styles.locationDetails}>
+              <Text style={styles.locationDetailText}>📍 Shared with: {profile?.emergencyContact?.name || 'Dad'}</Text>
+              <Text style={styles.locationDetailText}>📱 Help message: "I need assistance at my current location"</Text>
+              <Text style={styles.locationDetailText}>✅ Location updates: Active</Text>
+            </View>
+            <TouchableOpacity 
+              style={styles.locationOkButton}
+              onPress={() => setShowLocationModal(false)}
+            >
+              <Text style={styles.locationOkText}>Got it</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -358,5 +507,155 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#7F8C8D',
     lineHeight: 22,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  callingCard: {
+    backgroundColor: '#4A90E2',
+    borderRadius: 24,
+    padding: 32,
+    width: '100%',
+    maxWidth: 400,
+    alignItems: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    zIndex: 1,
+    padding: 8,
+  },
+  callingIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  callingStatus: {
+    fontSize: 18,
+    color: '#fff',
+    marginBottom: 16,
+    opacity: 0.9,
+  },
+  callingName: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 8,
+  },
+  callingNumber: {
+    fontSize: 18,
+    color: '#fff',
+    opacity: 0.8,
+    marginBottom: 24,
+  },
+  callDuration: {
+    fontSize: 24,
+    color: '#fff',
+    fontWeight: '600',
+    marginBottom: 32,
+  },
+  callingActions: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 32,
+  },
+  muteButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+  },
+  muteButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  speakerButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+  },
+  speakerButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  endCallButton: {
+    backgroundColor: '#E74C3C',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 16,
+    gap: 12,
+  },
+  endCallText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  locationCard: {
+    backgroundColor: '#fff',
+    borderRadius: 24,
+    padding: 32,
+    width: '100%',
+    maxWidth: 400,
+    alignItems: 'center',
+  },
+  locationIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#E3F2FD',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  locationTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#2C3E50',
+    marginBottom: 12,
+  },
+  locationMessage: {
+    fontSize: 16,
+    color: '#7F8C8D',
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 22,
+  },
+  locationDetails: {
+    width: '100%',
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+  },
+  locationDetailText: {
+    fontSize: 14,
+    color: '#2C3E50',
+    marginBottom: 8,
+    lineHeight: 20,
+  },
+  locationOkButton: {
+    backgroundColor: '#4A90E2',
+    paddingVertical: 14,
+    paddingHorizontal: 48,
+    borderRadius: 12,
+  },
+  locationOkText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

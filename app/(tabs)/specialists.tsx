@@ -6,9 +6,10 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
-  Linking,
+  Modal,
+  TextInput,
 } from 'react-native';
-import { MapPin, Phone, Clock, Star, ListFilter as Filter, Calendar } from 'lucide-react-native';
+import { MapPin, Clock, Star, ListFilter as Filter, Calendar, Info, X } from 'lucide-react-native';
 
 interface Specialist {
   id: string;
@@ -19,58 +20,76 @@ interface Specialist {
   phone: string;
   address: string;
   availability: string;
+  experience: string;
+  education: string;
+  languages: string;
 }
 
 const specialists: Specialist[] = [
   {
     id: '1',
-    name: 'Dr. Sarah Johnson',
+    name: 'Dr. Priya Sharma',
     specialty: 'Neurologist',
     rating: 4.8,
-    distance: '2.3 mi',
-    phone: '555-0101',
-    address: '123 Medical Plaza, Suite 200',
+    distance: '2.3 km',
+    phone: '9876543210',
+    address: 'Shop No. 12, Medical Plaza, Andheri West, Mumbai',
     availability: 'Available Today',
+    experience: '15 years',
+    education: 'MBBS, MD (Neurology), AIIMS Delhi',
+    languages: 'Hindi, English, Marathi',
   },
   {
     id: '2',
-    name: 'Dr. Michael Chen',
+    name: 'Dr. Rajesh Kumar',
     specialty: 'Psychiatrist',
     rating: 4.9,
-    distance: '3.1 mi',
-    phone: '555-0102',
-    address: '456 Health Center Blvd',
+    distance: '3.1 km',
+    phone: '9876543211',
+    address: 'Health Center, Bandra West, Mumbai',
     availability: 'Next Available: Tomorrow',
+    experience: '18 years',
+    education: 'MBBS, MD (Psychiatry), KEM Hospital',
+    languages: 'Hindi, English, Gujarati',
   },
   {
     id: '3',
-    name: 'Dr. Emily Rodriguez',
+    name: 'Dr. Sunita Patel',
     specialty: 'Geriatric Specialist',
     rating: 4.7,
-    distance: '4.5 mi',
-    phone: '555-0103',
-    address: '789 Care Drive, Building A',
+    distance: '4.5 km',
+    phone: '9876543212',
+    address: 'Care Clinic, Juhu, Mumbai',
     availability: 'Available Today',
+    experience: '12 years',
+    education: 'MBBS, MD (Geriatrics), Mumbai University',
+    languages: 'Hindi, English, Marathi, Gujarati',
   },
   {
     id: '4',
-    name: 'Dr. James Wilson',
+    name: 'Dr. Arjun Mehta',
     specialty: 'Neuropsychologist',
     rating: 4.9,
-    distance: '5.2 mi',
-    phone: '555-0104',
-    address: '321 Brain Health Institute',
+    distance: '5.2 km',
+    phone: '9876543213',
+    address: 'Brain Health Institute, Powai, Mumbai',
     availability: 'Next Available: Mon',
+    experience: '20 years',
+    education: 'MBBS, MD, DM (Neuropsychology), PGI Chandigarh',
+    languages: 'Hindi, English',
   },
   {
     id: '5',
-    name: 'Dr. Lisa Martinez',
+    name: 'Dr. Kavita Desai',
     specialty: 'Memory Care Specialist',
     rating: 4.8,
-    distance: '6.0 mi',
-    phone: '555-0105',
-    address: '654 Memory Lane Medical',
+    distance: '6.0 km',
+    phone: '9876543214',
+    address: 'Memory Care Center, Goregaon East, Mumbai',
     availability: 'Available Today',
+    experience: '14 years',
+    education: 'MBBS, MD (Neurology), Specialty in Memory Disorders',
+    languages: 'Hindi, English, Marathi',
   },
 ];
 
@@ -79,6 +98,11 @@ const specialties = ['All', 'Neurologist', 'Psychiatrist', 'Geriatric', 'Neurops
 export default function SpecialistsScreen() {
   const [selectedSpecialty, setSelectedSpecialty] = useState('All');
   const [sortBy, setSortBy] = useState<'distance' | 'rating'>('distance');
+  const [bookingModalVisible, setBookingModalVisible] = useState(false);
+  const [detailsModalVisible, setDetailsModalVisible] = useState(false);
+  const [selectedSpecialist, setSelectedSpecialist] = useState<Specialist | null>(null);
+  const [appointmentDate, setAppointmentDate] = useState('');
+  const [appointmentTime, setAppointmentTime] = useState('');
 
   const filteredSpecialists = specialists
     .filter((s) => selectedSpecialty === 'All' || s.specialty.includes(selectedSpecialty))
@@ -90,46 +114,38 @@ export default function SpecialistsScreen() {
       }
     });
 
-  const handleCall = (phone: string, name: string) => {
-    Alert.alert(
-      'Call Specialist',
-      `Would you like to call ${name}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Call',
-          onPress: () => {
-            Linking.openURL(`tel:${phone}`).catch(() => {
-              Alert.alert('Error', 'Unable to make call');
-            });
-          },
-        },
-      ]
-    );
-  };
-
   const handleBooking = (specialist: Specialist) => {
-    Alert.alert(
-      'Book Appointment',
-      `Book an appointment with ${specialist.name}?\n\n${specialist.availability}`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Confirm',
-          onPress: () => {
-            Alert.alert('Success', 'Appointment request sent! The office will call you to confirm.');
-          },
-        },
-      ]
-    );
+    setSelectedSpecialist(specialist);
+    setAppointmentDate('');
+    setAppointmentTime('');
+    setBookingModalVisible(true);
   };
 
-  const handleViewMap = () => {
+  const handleViewDetails = (specialist: Specialist) => {
+    setSelectedSpecialist(specialist);
+    setDetailsModalVisible(true);
+  };
+
+  const confirmBooking = () => {
+    if (!appointmentDate || !appointmentTime) {
+      Alert.alert('Error', 'Please select date and time for your appointment');
+      return;
+    }
+
+    setBookingModalVisible(false);
     Alert.alert(
-      'Map View',
-      'Opening map with nearby specialists...',
+      'Appointment Booked!',
+      `Your appointment with ${selectedSpecialist?.name} is confirmed for ${appointmentDate} at ${appointmentTime}.\n\nYou will receive a confirmation call shortly.`,
       [{ text: 'OK' }]
     );
+  };
+
+  const getTodayDate = () => {
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const yyyy = today.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
   };
 
   return (
@@ -137,11 +153,6 @@ export default function SpecialistsScreen() {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Find Specialists</Text>
         <Text style={styles.headerSubtitle}>Connect with healthcare professionals</Text>
-
-        <TouchableOpacity style={styles.mapButton} onPress={handleViewMap}>
-          <MapPin color="#4A90E2" size={20} />
-          <Text style={styles.mapButtonText}>View on Map</Text>
-        </TouchableOpacity>
       </View>
 
       <View style={styles.filtersSection}>
@@ -216,11 +227,11 @@ export default function SpecialistsScreen() {
 
             <View style={styles.actionsRow}>
               <TouchableOpacity
-                style={styles.callButton}
-                onPress={() => handleCall(specialist.phone, specialist.name)}
+                style={styles.detailsButton}
+                onPress={() => handleViewDetails(specialist)}
               >
-                <Phone color="#4A90E2" size={20} />
-                <Text style={styles.callButtonText}>Call</Text>
+                <Info color="#4A90E2" size={20} />
+                <Text style={styles.detailsButtonText}>Details</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -234,6 +245,134 @@ export default function SpecialistsScreen() {
           </View>
         ))}
       </ScrollView>
+
+      {/* Booking Modal */}
+      <Modal
+        visible={bookingModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setBookingModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Book Appointment</Text>
+              <TouchableOpacity onPress={() => setBookingModalVisible(false)}>
+                <X color="#7F8C8D" size={24} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.doctorNameModal}>{selectedSpecialist?.name}</Text>
+            <Text style={styles.specialtyModal}>{selectedSpecialist?.specialty}</Text>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Select Date (DD/MM/YYYY)</Text>
+              <TextInput
+                style={styles.input}
+                placeholder={`e.g., ${getTodayDate()}`}
+                value={appointmentDate}
+                onChangeText={setAppointmentDate}
+                keyboardType="numeric"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Select Time (IST)</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="e.g., 10:00 AM"
+                value={appointmentTime}
+                onChangeText={setAppointmentTime}
+              />
+            </View>
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setBookingModalVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.confirmButton}
+                onPress={confirmBooking}
+              >
+                <Text style={styles.confirmButtonText}>Confirm Booking</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Details Modal */}
+      <Modal
+        visible={detailsModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setDetailsModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Doctor Details</Text>
+              <TouchableOpacity onPress={() => setDetailsModalVisible(false)}>
+                <X color="#7F8C8D" size={24} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.avatarPlaceholderLarge}>
+              <Text style={styles.avatarTextLarge}>
+                {selectedSpecialist?.name.split(' ').map((n) => n[0]).join('')}
+              </Text>
+            </View>
+
+            <Text style={styles.doctorNameModal}>{selectedSpecialist?.name}</Text>
+            <Text style={styles.specialtyModal}>{selectedSpecialist?.specialty}</Text>
+
+            <View style={styles.detailsGrid}>
+              <View style={styles.detailItem}>
+                <Text style={styles.detailLabel}>Experience</Text>
+                <Text style={styles.detailValue}>{selectedSpecialist?.experience}</Text>
+              </View>
+
+              <View style={styles.detailItem}>
+                <Text style={styles.detailLabel}>Education</Text>
+                <Text style={styles.detailValue}>{selectedSpecialist?.education}</Text>
+              </View>
+
+              <View style={styles.detailItem}>
+                <Text style={styles.detailLabel}>Languages</Text>
+                <Text style={styles.detailValue}>{selectedSpecialist?.languages}</Text>
+              </View>
+
+              <View style={styles.detailItem}>
+                <Text style={styles.detailLabel}>Phone</Text>
+                <Text style={styles.detailValue}>{selectedSpecialist?.phone}</Text>
+              </View>
+
+              <View style={styles.detailItem}>
+                <Text style={styles.detailLabel}>Address</Text>
+                <Text style={styles.detailValue}>{selectedSpecialist?.address}</Text>
+              </View>
+
+              <View style={styles.detailItem}>
+                <Text style={styles.detailLabel}>Rating</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <Star color="#F39C12" size={16} fill="#F39C12" />
+                  <Text style={styles.detailValue}>{selectedSpecialist?.rating}</Text>
+                </View>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setDetailsModalVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -260,21 +399,6 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontSize: 16,
     color: '#7F8C8D',
-    marginBottom: 16,
-  },
-  mapButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#E3F2FD',
-    paddingVertical: 12,
-    borderRadius: 12,
-    gap: 8,
-  },
-  mapButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#4A90E2',
   },
   filtersSection: {
     backgroundColor: '#fff',
@@ -414,7 +538,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
   },
-  callButton: {
+  detailsButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
@@ -424,7 +548,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     gap: 8,
   },
-  callButtonText: {
+  detailsButtonText: {
     fontSize: 16,
     fontWeight: '600',
     color: '#4A90E2',
@@ -440,6 +564,137 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   bookButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#2C3E50',
+  },
+  doctorNameModal: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#2C3E50',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  specialtyModal: {
+    fontSize: 16,
+    color: '#7F8C8D',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  inputContainer: {
+    marginBottom: 16,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#2C3E50',
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#E9ECEF',
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 16,
+    color: '#2C3E50',
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+  },
+  cancelButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: '#F8F9FA',
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#7F8C8D',
+  },
+  confirmButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: '#4A90E2',
+    alignItems: 'center',
+  },
+  confirmButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  avatarPlaceholderLarge: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#4A90E2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginBottom: 16,
+  },
+  avatarTextLarge: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  detailsGrid: {
+    gap: 16,
+    marginTop: 8,
+  },
+  detailItem: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#E9ECEF',
+    paddingBottom: 12,
+  },
+  detailLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#7F8C8D',
+    marginBottom: 4,
+    textTransform: 'uppercase',
+  },
+  detailValue: {
+    fontSize: 15,
+    color: '#2C3E50',
+  },
+  closeButton: {
+    marginTop: 24,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: '#4A90E2',
+    alignItems: 'center',
+  },
+  closeButtonText: {
     fontSize: 16,
     fontWeight: '600',
     color: '#fff',
