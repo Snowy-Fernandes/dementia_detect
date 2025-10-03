@@ -60,7 +60,7 @@ const CommunityApp = () => {
     {
       id: '1',
       author: 'Sarah M.',
-      avatarColor: '#1e1857ff',
+      avatarColor: '#4A90E2',
       title: 'Tips for Daily Memory Exercises',
       content: 'I\'ve been doing these memory games every morning and seeing great results! Anyone else have a routine that works?',
       category: 'Memory',
@@ -68,15 +68,15 @@ const CommunityApp = () => {
       likes: 24,
       likedByUser: false,
       comments: [
-        { id: 'c1', author: 'John K.', content: 'This is really helpful!', timeAgo: '1h ago', avatarColor: '#1e1857ff' },
-        { id: 'c2', author: 'Amy L.', content: 'What games do you recommend?', timeAgo: '30m ago', avatarColor: '#1e1857ff' }
+        { id: 'c1', author: 'John K.', content: 'This is really helpful!', timeAgo: '1h ago', avatarColor: '#4A90E2' },
+        { id: 'c2', author: 'Amy L.', content: 'What games do you recommend?', timeAgo: '30m ago', avatarColor: '#4A90E2' }
       ],
       timeAgo: '2h ago',
     },
     {
       id: '2',
       author: 'John D.',
-      avatarColor: '#1e1857ff',
+      avatarColor: '#4A90E2',
       title: 'Morning Meditation Session',
       content: 'Just finished an amazing meditation session. Feeling centered and ready for the day!',
       category: 'Support',
@@ -89,7 +89,7 @@ const CommunityApp = () => {
     {
       id: '3',
       author: 'Emily R.',
-      avatarColor: '#1e1857ff',
+      avatarColor: '#4A90E2',
       title: 'Nutrition and Brain Health',
       content: 'What foods have you found helpful? I\'ve been focusing on omega-3 rich foods and seeing improvements.',
       category: 'Wellness',
@@ -134,7 +134,6 @@ const CommunityApp = () => {
   };
 
   const handleMediaUpload = (type: 'image' | 'video'): void => {
-    // In a real app, you would use expo-image-picker or expo-document-picker here
     Alert.alert('Media Upload', `This would open the ${type} picker in a real app`);
   };
 
@@ -143,7 +142,7 @@ const CommunityApp = () => {
       const post: Post = {
         id: Date.now().toString(),
         author: 'You',
-        avatarColor: '#1e1857ff',
+        avatarColor: '#4A90E2',
         title: newPost.title,
         content: newPost.content,
         category: newPost.category,
@@ -173,7 +172,7 @@ const CommunityApp = () => {
               author: 'You',
               content: newComment,
               timeAgo: 'Just now',
-              avatarColor: '#1e1857ff'
+              avatarColor: '#4A90E2'
             }]
           };
         }
@@ -245,12 +244,12 @@ const CommunityApp = () => {
             post.likedByUser && styles.likedIconContainer
           ]}>
             <Heart
-              size={20}
-              color={post.likedByUser ? '#1e1857ff' : '#6B7280'}
-              fill={post.likedByUser ? '#1e1857ff' : 'transparent'}
+              size={18}
+              color={post.likedByUser ? '#4A90E2' : '#8E8E93'}
+              fill={post.likedByUser ? '#4A90E2' : 'transparent'}
             />
           </View>
-          <Text style={styles.actionText}>{post.likes} Likes</Text>
+          <Text style={styles.actionText}>{post.likes}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -258,9 +257,9 @@ const CommunityApp = () => {
           style={styles.actionButton}
         >
           <View style={styles.actionIconContainer}>
-            <MessageCircle size={20} color="#6B7280" />
+            <MessageCircle size={18} color="#8E8E93" />
           </View>
-          <Text style={styles.actionText}>{post.comments.length} Comments</Text>
+          <Text style={styles.actionText}>{post.comments.length}</Text>
         </TouchableOpacity>
       </View>
 
@@ -302,13 +301,14 @@ const CommunityApp = () => {
               value={newComment}
               onChangeText={setNewComment}
               style={styles.commentInput}
+              placeholderTextColor="#C7C7CC"
               onSubmitEditing={() => handleAddComment(post.id)}
             />
             <TouchableOpacity
               onPress={() => handleAddComment(post.id)}
               style={styles.commentSendButton}
             >
-              <Send size={20} color="#FFFFFF" />
+              <Send size={18} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
         </View>
@@ -322,11 +322,11 @@ const CommunityApp = () => {
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <View>
-            <Text style={styles.headerTitle}>Community Forum</Text>
-            <Text style={styles.headerSubtitle}>Connect, share, and support each other</Text>
+            <Text style={styles.headerTitle}>Community</Text>
+            <Text style={styles.headerSubtitle}>Connect and share experiences</Text>
           </View>
           <View style={styles.onlineBadge}>
-            <Text style={styles.onlineLabel}>Online Now</Text>
+            <View style={styles.onlineDot} />
             <Text style={styles.onlineCount}>1,234</Text>
           </View>
         </View>
@@ -335,16 +335,14 @@ const CommunityApp = () => {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Search Bar */}
         <View style={styles.searchContainer}>
-          <View style={styles.searchInner}>
-            <Search size={20} color="#1e1857ff" />
-            <TextInput
-              placeholder="Search discussions, topics, or keywords..."
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              style={styles.searchInput}
-              placeholderTextColor="#9CA3AF"
-            />
-          </View>
+          <Search size={18} color="#C7C7CC" />
+          <TextInput
+            placeholder="Search discussions..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            style={styles.searchInput}
+            placeholderTextColor="#C7C7CC"
+          />
         </View>
 
         {/* Categories */}
@@ -352,6 +350,7 @@ const CommunityApp = () => {
           horizontal 
           showsHorizontalScrollIndicator={false}
           style={styles.categoriesContainer}
+          contentContainerStyle={styles.categoriesContent}
         >
           {categories.map(category => (
             <TouchableOpacity
@@ -373,9 +372,11 @@ const CommunityApp = () => {
         </ScrollView>
 
         {/* Trending Badge */}
-        <View style={styles.trendingBadge}>
-          <TrendingUp size={20} color="#FFFFFF" />
-          <Text style={styles.trendingText}>Trending Now</Text>
+        <View style={styles.trendingContainer}>
+          <View style={styles.trendingBadge}>
+            <TrendingUp size={16} color="#4A90E2" />
+            <Text style={styles.trendingText}>Trending Now</Text>
+          </View>
         </View>
 
         {/* Posts List */}
@@ -393,8 +394,7 @@ const CommunityApp = () => {
         onPress={() => setShowNewPost(true)}
         style={styles.fab}
       >
-        <Plus size={24} color="#FFFFFF" />
-        <Text style={styles.fabText}>New Post</Text>
+        <Plus size={22} color="#FFFFFF" />
       </TouchableOpacity>
 
       {/* New Post Modal */}
@@ -403,9 +403,8 @@ const CommunityApp = () => {
         animationType="slide"
         presentationStyle="pageSheet"
       >
-        <View style={styles.modalContainer}>
+        <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Create New Post</Text>
             <TouchableOpacity
               onPress={() => {
                 setShowNewPost(false);
@@ -413,16 +412,20 @@ const CommunityApp = () => {
               }}
               style={styles.modalCloseButton}
             >
-              <X size={28} color="#FFFFFF" />
+              <X size={24} color="#000000" />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>New Post</Text>
+            <TouchableOpacity
+              onPress={handleAddPost}
+              style={styles.modalPostButton}
+            >
+              <Text style={styles.modalPostButtonText}>Post</Text>
             </TouchableOpacity>
           </View>
 
           <ScrollView style={styles.modalContent}>
             <View style={styles.modalSection}>
               <Text style={styles.label}>Category</Text>
-              <View style={styles.pickerContainer}>
-                <Text style={styles.pickerText}>{newPost.category}</Text>
-              </View>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryPicker}>
                 {categories.filter(c => c !== 'All').map(cat => (
                   <TouchableOpacity
@@ -451,6 +454,7 @@ const CommunityApp = () => {
                 onChangeText={(text) => setNewPost({ ...newPost, title: text })}
                 placeholder="What's on your mind?"
                 style={styles.textInput}
+                placeholderTextColor="#C7C7CC"
               />
             </View>
 
@@ -459,30 +463,31 @@ const CommunityApp = () => {
               <TextInput
                 value={newPost.content}
                 onChangeText={(text) => setNewPost({ ...newPost, content: text })}
-                placeholder="Share your thoughts with the community..."
+                placeholder="Share your thoughts..."
                 multiline
-                numberOfLines={4}
+                numberOfLines={6}
                 style={[styles.textInput, styles.textArea]}
+                placeholderTextColor="#C7C7CC"
               />
             </View>
 
             {/* Media Upload */}
             <View style={styles.modalSection}>
-              <Text style={styles.label}>Add Media (Optional)</Text>
+              <Text style={styles.label}>Add Media</Text>
               <View style={styles.mediaButtonsContainer}>
                 <TouchableOpacity
                   onPress={() => handleMediaUpload('image')}
                   style={styles.mediaButton}
                 >
-                  <ImageIcon size={20} color="#FFFFFF" />
-                  <Text style={styles.mediaButtonText}>Add Photo</Text>
+                  <ImageIcon size={20} color="#4A90E2" />
+                  <Text style={styles.mediaButtonText}>Photo</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => handleMediaUpload('video')}
                   style={styles.mediaButton}
                 >
-                  <Video size={20} color="#FFFFFF" />
-                  <Text style={styles.mediaButtonText}>Add Video</Text>
+                  <Video size={20} color="#4A90E2" />
+                  <Text style={styles.mediaButtonText}>Video</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -507,30 +512,12 @@ const CommunityApp = () => {
                   }}
                   style={styles.removeMediaButton}
                 >
-                  <X size={20} color="#FFFFFF" />
+                  <X size={18} color="#FFFFFF" />
                 </TouchableOpacity>
               </View>
             )}
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity
-                onPress={() => {
-                  setShowNewPost(false);
-                  setMediaPreview(null);
-                }}
-                style={styles.cancelButton}
-              >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleAddPost}
-                style={styles.postButton}
-              >
-                <Text style={styles.postButtonText}>Post Now</Text>
-              </TouchableOpacity>
-            </View>
           </ScrollView>
-        </View>
+        </SafeAreaView>
       </Modal>
     </SafeAreaView>
   );
@@ -539,18 +526,15 @@ const CommunityApp = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F3FF',
+    backgroundColor: '#F2F2F7',
   },
   header: {
-    backgroundColor: '#1e1857ff',
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 20,
-    paddingTop: 60,
+    paddingTop: 16,
     paddingBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5EA',
   },
   headerContent: {
     flexDirection: 'row',
@@ -558,154 +542,131 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 32,
-    fontWeight: '900',
-    color: '#FFFFFF',
-    marginBottom: 4,
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#000000',
+    marginBottom: 2,
   },
   headerSubtitle: {
-    fontSize: 18,
-    color: '#DDD6FE',
+    fontSize: 14,
+    color: '#8E8E93',
+    fontWeight: '400',
   },
   onlineBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backdropFilter: 'blur(10px)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F2F2F7',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    gap: 6,
   },
-  onlineLabel: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
+  onlineDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#34C759',
   },
   onlineCount: {
-    color: '#FFFFFF',
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginTop: 2,
+    color: '#000000',
+    fontSize: 14,
+    fontWeight: '600',
   },
   scrollView: {
     flex: 1,
   },
   searchContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
-    margin: 20,
-    marginBottom: 16,
-    borderRadius: 20,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: '#FFFFFF',
-  },
-  searchInner: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    backgroundColor: '#FFFFFF',
+    margin: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 12,
+    gap: 10,
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: '#374151',
+    color: '#000000',
+    fontWeight: '400',
   },
   categoriesContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  categoriesContent: {
+    gap: 8,
   },
   categoryButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderRadius: 20,
-    marginRight: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
   },
   categoryButtonActive: {
-    backgroundColor: '#1e1857ff',
-    shadowColor: '#1e1857ff',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    backgroundColor: '#4A90E2',
+    borderColor: '#4A90E2',
   },
   categoryButtonText: {
     fontSize: 14,
-    fontWeight: 'bold',
-    color: '#374151',
+    fontWeight: '600',
+    color: '#000000',
   },
   categoryButtonTextActive: {
     color: '#FFFFFF',
   },
+  trendingContainer: {
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
   trendingBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#1e1857ff',
+    gap: 6,
+    backgroundColor: '#FFFFFF',
     alignSelf: 'flex-start',
-    marginHorizontal: 20,
-    marginBottom: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: 20,
-    shadowColor: '#1e1857ff',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
   },
   trendingText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: '#4A90E2',
+    fontSize: 14,
+    fontWeight: '600',
   },
   postsList: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
   },
   postCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 24,
-    marginBottom: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 5,
-    borderWidth: 1,
-    borderColor: '#FFFFFF',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    marginBottom: 12,
+    padding: 16,
   },
   postHeader: {
     flexDirection: 'row',
-    gap: 16,
-    marginBottom: 16,
+    gap: 12,
+    marginBottom: 12,
   },
   avatarContainer: {
     alignItems: 'center',
   },
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 16,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
   },
   avatarText: {
     color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '900',
+    fontSize: 16,
+    fontWeight: '600',
   },
   postContent: {
     flex: 1,
@@ -714,59 +675,51 @@ const styles = StyleSheet.create({
   postMeta: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
+    gap: 6,
+    marginBottom: 6,
     flexWrap: 'wrap',
   },
   authorName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#111827',
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#000000',
   },
   dot: {
-    color: '#9CA3AF',
-    fontSize: 14,
+    color: '#C7C7CC',
+    fontSize: 12,
   },
   timeAgo: {
-    fontSize: 14,
-    color: '#6B7280',
+    fontSize: 13,
+    color: '#8E8E93',
+    fontWeight: '400',
   },
   categoryBadge: {
-    backgroundColor: '#1e1857ff',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 20,
-    shadowColor: '#1e1857ff',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: '#F2F2F7',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
   },
   categoryText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: 'bold',
+    color: '#4A90E2',
+    fontSize: 11,
+    fontWeight: '600',
   },
   postTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#111827',
-    marginBottom: 8,
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#000000',
+    marginBottom: 6,
   },
   postContentText: {
-    fontSize: 16,
-    color: '#6B7280',
-    lineHeight: 22,
+    fontSize: 15,
+    color: '#3C3C43',
+    lineHeight: 20,
+    fontWeight: '400',
   },
   mediaContainer: {
-    marginBottom: 16,
-    borderRadius: 16,
+    marginBottom: 12,
+    borderRadius: 12,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 6,
   },
   mediaImage: {
     width: '100%',
@@ -775,78 +728,76 @@ const styles = StyleSheet.create({
   videoPlaceholder: {
     width: '100%',
     height: 200,
-    backgroundColor: '#1F2937',
+    backgroundColor: '#F2F2F7',
     justifyContent: 'center',
     alignItems: 'center',
   },
   videoText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: '#8E8E93',
+    fontSize: 16,
+    fontWeight: '600',
     marginBottom: 4,
   },
   videoSubtext: {
-    color: '#D1D5DB',
-    fontSize: 14,
+    color: '#C7C7CC',
+    fontSize: 13,
   },
   actionsBar: {
     flexDirection: 'row',
-    gap: 24,
-    paddingTop: 16,
+    gap: 20,
+    paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: '#F2F2F7',
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   actionIconContainer: {
-    padding: 8,
-    borderRadius: 20,
-    backgroundColor: '#F3F4F6',
+    padding: 6,
+    borderRadius: 16,
+    backgroundColor: '#F2F2F7',
   },
   likedIconContainer: {
-    backgroundColor: '#EDE9FE',
+    backgroundColor: '#E3F2FD',
   },
   actionText: {
     fontSize: 14,
-    fontWeight: 'bold',
-    color: '#374151',
+    fontWeight: '600',
+    color: '#8E8E93',
   },
   commentsSection: {
-    marginTop: 16,
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#F2F2F7',
   },
   commentsList: {
     maxHeight: 200,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   commentCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
+    backgroundColor: '#F2F2F7',
+    borderRadius: 12,
+    padding: 12,
     marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
   },
   commentHeader: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 10,
   },
   commentAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
   },
   commentAvatarText: {
     color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 12,
+    fontWeight: '600',
   },
   commentContent: {
     flex: 1,
@@ -854,143 +805,132 @@ const styles = StyleSheet.create({
   commentMeta: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
     marginBottom: 4,
   },
   commentAuthor: {
     fontSize: 14,
-    fontWeight: 'bold',
-    color: '#111827',
+    fontWeight: '600',
+    color: '#000000',
   },
   commentTime: {
     fontSize: 12,
-    color: '#9CA3AF',
+    color: '#8E8E93',
   },
   commentText: {
     fontSize: 14,
-    color: '#374151',
-    lineHeight: 20,
+    color: '#3C3C43',
+    lineHeight: 18,
   },
   commentInputContainer: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 8,
   },
   commentInput: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F2F2F7',
     borderRadius: 20,
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-    fontSize: 16,
+    paddingVertical: 10,
+    fontSize: 15,
+    color: '#000000',
   },
   commentSendButton: {
-    backgroundColor: '#1e1857ff',
-    padding: 12,
+    backgroundColor: '#4A90E2',
+    padding: 10,
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
+    width: 40,
+    height: 40,
   },
   fab: {
     position: 'absolute',
-    bottom: 30,
+    bottom: 24,
     right: 20,
-    backgroundColor: '#1e1857ff',
-    flexDirection: 'row',
+    backgroundColor: '#4A90E2',
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
-    paddingLeft: 20,
-    paddingRight: 24,
-    paddingVertical: 16,
-    borderRadius: 30,
-    shadowColor: '#1e1857ff',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
     elevation: 8,
-  },
-  fabText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
   },
   modalContainer: {
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
   modalHeader: {
-    backgroundColor: '#1e1857ff',
-    padding: 24,
-    paddingTop: 60,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 28,
-    fontWeight: '900',
-    color: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5EA',
   },
   modalCloseButton: {
-    padding: 8,
-    borderRadius: 12,
+    padding: 4,
+    width: 60,
+  },
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#000000',
+  },
+  modalPostButton: {
+    width: 60,
+    alignItems: 'flex-end',
+  },
+  modalPostButtonText: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#4A90E2',
   },
   modalContent: {
     flex: 1,
-    padding: 20,
+    padding: 16,
   },
   modalSection: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
   label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#374151',
-    marginBottom: 8,
-  },
-  pickerContainer: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-  },
-  pickerText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
-    color: '#374151',
+    color: '#000000',
+    marginBottom: 8,
   },
   categoryPicker: {
     marginBottom: 8,
   },
   categoryOption: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#F2F2F7',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 16,
+    borderRadius: 20,
     marginRight: 8,
   },
   categoryOptionActive: {
-    backgroundColor: '#1e1857ff',
+    backgroundColor: '#4A90E2',
   },
   categoryOptionText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: '#000000',
   },
   categoryOptionTextActive: {
     color: '#FFFFFF',
   },
   textInput: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-    borderRadius: 16,
-    padding: 16,
+    backgroundColor: '#F2F2F7',
+    borderRadius: 12,
+    padding: 14,
     fontSize: 16,
-    color: '#374151',
+    color: '#000000',
   },
   textArea: {
     height: 120,
@@ -1002,33 +942,23 @@ const styles = StyleSheet.create({
   },
   mediaButton: {
     flex: 1,
-    backgroundColor: '#1e1857ff',
+    backgroundColor: '#F2F2F7',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    padding: 16,
-    borderRadius: 16,
-    shadowColor: '#1e1857ff',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    padding: 14,
+    borderRadius: 12,
   },
   mediaButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+    color: '#4A90E2',
+    fontSize: 15,
     fontWeight: '600',
   },
   mediaPreviewContainer: {
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: 'hidden',
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
   },
   mediaPreview: {
     width: '100%',
@@ -1037,61 +967,22 @@ const styles = StyleSheet.create({
   videoPreview: {
     width: '100%',
     height: 200,
-    backgroundColor: '#1F2937',
+    backgroundColor: '#F2F2F7',
     justifyContent: 'center',
     alignItems: 'center',
   },
   videoPreviewText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: '#8E8E93',
+    fontSize: 16,
+    fontWeight: '600',
   },
   removeMediaButton: {
     position: 'absolute',
     top: 12,
     right: 12,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#FF3B30',
     padding: 8,
     borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  modalActions: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 20,
-  },
-  cancelButton: {
-    flex: 1,
-    backgroundColor: '#F3F4F6',
-    padding: 16,
-    borderRadius: 16,
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#374151',
-  },
-  postButton: {
-    flex: 1,
-    backgroundColor: '#1e1857ff',
-    padding: 16,
-    borderRadius: 16,
-    alignItems: 'center',
-    shadowColor: '#1e1857ff',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  postButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
   },
 });
 
